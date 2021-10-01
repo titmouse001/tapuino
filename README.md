@@ -2,9 +2,21 @@
 
 The C64 Tape Emulator using an Arduino pro mini  (ATmega328 2KB version)
 
+### Compression Tool Can be Found Here:
+Executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1.0.0.1  
+code: https://github.com/titmouse001/C64TapCompressionTool  
+
+----
+Changes:
 - Added compression support
-  - tap files can be compressed with TapCompression.exe tool (into compressed .zap files)
-  - Replaced 9x9 font with a smaller 5x7.
+  - tap files can be compressed with the 'Tap Compression Tool'
+     - compressed files are called .zap files
+     - tap files are still supported - you can mix both tap and zap files together
+  - Example savings: Zybex.tap (881KB) -> Zybex.zap (89KB)
+- Replaced 9x9 font with a smaller 5x7
+  - includes a dedicated arrow for off screen text
+- Fixed minor scrolling filename bug
+- Tweaked display logic
 
-
+----
 Forked from here: https://github.com/sweetlilmre/tapuino
