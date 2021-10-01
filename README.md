@@ -1,4 +1,4 @@
-Tapuino
+Tapuino - tweeked version (with compression support)
 =======
 
 The $20 C64 Tape Emulator
