@@ -488,8 +488,7 @@ typedef struct {
 */
 
 #if _VOLUMES >= 1 || _VOLUMES <= 10
-static
-FATFS *FatFs[_VOLUMES];		/* Pointer to the file system objects (logical drives) */
+static FATFS *FatFs[_VOLUMES];		/* Pointer to the file system objects (logical drives) */
 #else
 #error Number of volumes must be 1 to 10.
 #endif
@@ -1757,7 +1756,9 @@ void get_fileinfo (		/* No return code */
 #if _LFN_UNICODE
 			if (IsDBCS1(c) && i != 8 && i != 11 && IsDBCS2(dir[i]))
 				c = c << 8 | dir[i++];
-			c = ff_convert(c, 1);	/* OEM -> Unicode */
+				
+			// c = ff_convert(c, 1);	/* OEM -> Unicode */
+			
 			if (!c) c = '?';
 #endif
 #endif
@@ -1779,7 +1780,9 @@ void get_fileinfo (		/* No return code */
 			lfn = dp->lfn;
 			while ((w = *lfn++) != 0) {		/* Get an LFN character */
 #if !_LFN_UNICODE
-				w = ff_convert(w, 0);		/* Unicode -> OEM */
+
+				//w = ff_convert(w, 0);		/* Unicode -> OEM */
+				
 				if (!w) { i = 0; break; }	/* No LFN if it could not be converted */
 				if (_DF1S && w >= 0x100)	/* Put 1st byte if it is a DBC (always false on SBCS cfg) */
 					p[i++] = (TCHAR)(w >> 8);
@@ -1828,9 +1831,12 @@ FRESULT create_name (
 			b = (BYTE)p[si++];			/* Get 2nd byte */
 			if (!IsDBCS2(b))
 				return FR_INVALID_NAME;	/* Reject invalid sequence */
+
 			w = (w << 8) + b;			/* Create a DBC */
 		}
-		w = ff_convert(w, 1);			/* Convert ANSI/OEM to Unicode */
+		
+		//w = ff_convert(w, 1);			/* Convert ANSI/OEM to Unicode */
+		
 		if (!w) return FR_INVALID_NAME;	/* Reject invalid code */
 #endif
 		if (w < 0x80 && chk_chr("\"*:<>\?|\x7F", w)) /* Reject illegal characters for LFN */
@@ -1884,10 +1890,11 @@ FRESULT create_name (
 
 		if (w >= 0x80) {				/* Non ASCII character */
 #ifdef _EXCVT
-			w = ff_convert(w, 0);		/* Unicode -> OEM code */
+			//w = ff_convert(w, 0);		/* Unicode -> OEM code */
 			if (w) w = ExCvt[w - 0x80];	/* Convert extended character to upper (SBCS) */
 #else
-			w = ff_convert(ff_wtoupper(w), 0);	/* Upper converted Unicode -> OEM code */
+			//w = ff_convert(ff_wtoupper(w), 0);	/* Upper converted Unicode -> OEM code */
+			w = ff_wtoupper(w);
 #endif
 			cf |= NS_LFN;				/* Force create LFN entry */
 		}
@@ -2072,58 +2079,64 @@ FRESULT follow_path (	/* FR_OK(0): successful, !=0: error code */
 /*-----------------------------------------------------------------------*/
 /* Get logical drive number from path name                               */
 /*-----------------------------------------------------------------------*/
+static int get_ldnumber(__attribute__((unused)) const TCHAR** path){
 
-static
-int get_ldnumber (		/* Returns logical drive number (-1:invalid drive) */
-	const TCHAR** path	/* Pointer to pointer to the path name */
-)
-{
-	const TCHAR *tp, *tt;
-	UINT i;
-	int vol = -1;
-
-
-	if (*path) {	/* If the pointer is not a null */
-		for (tt = *path; (UINT)*tt >= (_USE_LFN ? ' ' : '!') && *tt != ':'; tt++) ;	/* Find ':' in the path */
-		if (*tt == ':') {	/* If a ':' is exist in the path name */
-			tp = *path;
-			i = *tp++ - '0'; 
-			if (i < 10 && tp == tt) {	/* Is there a numeric drive id? */
-				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
-					vol = (int)i;
-					*path = ++tt;
-				}
-			} else {	/* No numeric drive number */
-#if _STR_VOLUME_ID		/* Find string drive id */
-				static const char* const str[] = {_VOLUME_STRS};
-				const char *sp;
-				char c;
-				TCHAR tc;
-
-				i = 0; tt++;
-				do {
-					sp = str[i]; tp = *path;
-					do {	/* Compare a string drive id with path name */
-						c = *sp++; tc = *tp++;
-						if (IsLower(tc)) tc -= 0x20;
-					} while (c && (TCHAR)c == tc);
-				} while ((c || tp != tt) && ++i < _VOLUMES);	/* Repeat for each id until pattern match */
-				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
-					vol = (int)i;
-					*path = tt;
-				}
-#endif
-			}
-			return vol;
-		}
-#if _FS_RPATH && _VOLUMES >= 2
-		vol = CurrVol;	/* Current drive */
-#else
-		vol = 0;		/* Drive 0 */
-#endif
-	}
-	return vol;
+  // don't need functionality , just return 0
+  return 0;
 }
+
+//
+//static
+//int get_ldnumber (		/* Returns logical drive number (-1:invalid drive) */
+//	const TCHAR** path	/* Pointer to pointer to the path name */
+//)
+//{
+//	const TCHAR *tp, *tt;
+//	UINT i;
+//	int vol = -1;
+//
+//
+//	if (*path) {	/* If the pointer is not a null */
+//		for (tt = *path; (UINT)*tt >= (_USE_LFN ? ' ' : '!') && *tt != ':'; tt++) ;	/* Find ':' in the path */
+//		if (*tt == ':') {	/* If a ':' is exist in the path name */
+//			tp = *path;
+//			i = *tp++ - '0'; 
+//			if (i < 10 && tp == tt) {	/* Is there a numeric drive id? */
+//				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
+//					vol = (int)i;
+//					*path = ++tt;
+//				}
+//			} else {	/* No numeric drive number */
+//#if _STR_VOLUME_ID		/* Find string drive id */
+//				static const char* const str[] = {_VOLUME_STRS};
+//				const char *sp;
+//				char c;
+//				TCHAR tc;
+//
+//				i = 0; tt++;
+//				do {
+//					sp = str[i]; tp = *path;
+//					do {	/* Compare a string drive id with path name */
+//						c = *sp++; tc = *tp++;
+//						if (IsLower(tc)) tc -= 0x20;
+//					} while (c && (TCHAR)c == tc);
+//				} while ((c || tp != tt) && ++i < _VOLUMES);	/* Repeat for each id until pattern match */
+//				if (i < _VOLUMES) {	/* If a drive id is found, get the value and strip it */
+//					vol = (int)i;
+//					*path = tt;
+//				}
+//#endif
+//			}
+//			return vol;
+//		}
+//#if _FS_RPATH && _VOLUMES >= 2
+//		vol = CurrVol;	/* Current drive */
+//#else
+//		vol = 0;		/* Drive 0 */
+//#endif
+//	}
+//	return vol;
+//}
 
 
 
@@ -2181,6 +2194,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	if (vol < 0) return FR_INVALID_DRIVE;
 
 	/* Check if the file system object is valid or not */
+  
 	fs = FatFs[vol];					/* Get pointer to the file system object */
 	if (!fs) return FR_NOT_ENABLED;		/* Is the file system object available? */
 
@@ -3778,7 +3792,10 @@ FRESULT f_getlabel (
 					w = (i < 11) ? dj.dir[i++] : ' ';
 					if (IsDBCS1(w) && i < 11 && IsDBCS2(dj.dir[i]))
 						w = w << 8 | dj.dir[i++];
-					label[j++] = ff_convert(w, 1);	/* OEM -> Unicode */
+						
+					//label[j++] = ff_convert(w, 1);	/* OEM -> Unicode */
+					label[j++] = w);
+					
 				} while (j < 11);
 #else
 				mem_cpy(label, dj.dir, 11);
@@ -3839,13 +3856,15 @@ FRESULT f_setlabel (
 		i = j = 0;
 		do {
 #if _USE_LFN && _LFN_UNICODE
-			w = ff_convert(ff_wtoupper(label[i++]), 0);
+			//w = ff_convert(ff_wtoupper(label[i++]), 0);
+			w = ff_wtoupper(label[i++]);
 #else
 			w = (BYTE)label[i++];
 			if (IsDBCS1(w))
 				w = (j < 10 && i < sl && IsDBCS2(label[i])) ? w << 8 | (BYTE)label[i++] : 0;
 #if _USE_LFN
-			w = ff_convert(ff_wtoupper(ff_convert(w, 1)), 0);
+			//w = ff_convert(ff_wtoupper(ff_convert(w, 1)), 0);
+			w = ff_wtoupper(w);
 #else
 			if (IsLower(w)) w -= 0x20;			/* To upper ASCII characters */
 #ifdef _EXCVT
@@ -4344,7 +4363,7 @@ TCHAR* f_gets (
 			if (rc != 1) break;
 			c = (c << 8) + s[0];
 		}
-		c = ff_convert(c, 1);	/* OEM -> Unicode */
+		//c = ff_convert(c, 1);	/* OEM -> Unicode */
 		if (!c) c = '?';
 #endif
 #else						/* Read a character without conversion */
@@ -4412,7 +4431,7 @@ void putc_bfd (
 	pb->buf[i++] = (BYTE)c;
 	pb->buf[i++] = (BYTE)(c >> 8);
 #else							/* Write a character in ANSI/OEM */
-	c = ff_convert(c, 0);	/* Unicode -> OEM */
+	//c = ff_convert(c, 0);	/* Unicode -> OEM */
 	if (!c) c = '?';
 	if (c >= 0x100)
 		pb->buf[i++] = (BYTE)(c >> 8);

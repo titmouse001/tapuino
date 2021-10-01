@@ -36,8 +36,11 @@ void filename_ticker(FILINFO* pfile_info, uint32_t cur_tick) {
       return;
     }
 
+    // if needed adjust scroll amount for the end director marker
+    uint8_t limit = (pfile_info->fattrib & AM_DIR) ? MAX_LCD_LINE_LEN-1 : MAX_LCD_LINE_LEN; 
+  
     // is the filename within screen bounds?
-    if ((strlen(g_ticker_string) - g_ticker_index) < MAX_LCD_LINE_LEN) {
+    if ((strlen(g_ticker_string) - g_ticker_index) <= limit) {
       // how long do we hold at the end?
       if (cur_tick - g_last_hold < (uint32_t) (g_ticker_hold_rate << 1)) {
         return;
@@ -137,6 +140,10 @@ void lcd_title_P(const char* msg) {
 
 void lcd_status(char* msg) {
   lcd_line(msg, 1, 0);
+}
+
+void lcd_information_P(const char* msg) {
+  lcd_line((char*)msg, 5, 1);
 }
 
 void lcd_status_P(const char* msg) {

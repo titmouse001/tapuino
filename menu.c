@@ -49,7 +49,10 @@ uint8_t handle_select_mode(const char* ptitle, const char** ppitems, uint8_t max
   uint8_t prev_mode = (cur_mode + 1) % max;
 
   lcd_title_P(ptitle);
-  
+
+  lcd_information_P(ptitle);
+
+    
   while (1) {
     if (prev_mode != cur_mode) {
       lcd_status_P(ppitems[cur_mode]);
@@ -180,57 +183,62 @@ uint8_t handle_manual_filename(FILINFO* pfile_info) {
   uint8_t cursor_pos = 0;
   uint8_t max_chars = strlen_P(S_FILENAME_CHARS);
   uint8_t cur_char = 0;
+ 
   lcd_title_P(S_ENTER_FILENAME);
   lcd_status("");
   lcd_cursor();
   lcd_setCursor(0, 1);
-  
+  set_displayCursor(0);
   // start with a nicely terminated string!
   memset(pfile_info->lfname, 0, pfile_info->lfsize);
-  
+  pfile_info->lfname[cursor_pos] = ' '; 
+     
   while (1) {
+   
     switch(get_cur_command()) {
       case COMMAND_SELECT:
         if (cursor_pos < (MAX_LCD_LINE_LEN - 1)) {
           cur_char = pgm_read_byte(S_FILENAME_CHARS + cur_char_pos);
-          pfile_info->lfname[cursor_pos] = cur_char;        
+          pfile_info->lfname[cursor_pos] = cur_char; 
           cursor_pos++;
-          lcd_setCursor(cursor_pos, 1);
           cur_char_pos = 0;
+          pfile_info->lfname[cursor_pos] = ' '; 
+          set_displayCursor(cursor_pos);
         }
       break;
       case COMMAND_SELECT_LONG:
         strcat(pfile_info->lfname, ".tap");
-        lcd_noCursor();
-        // exit to previous menu, with accept
-        return 1;
+        set_displayCursor(-1);
+        return 1;  // exit to previous menu, with accept
       break;
       case COMMAND_ABORT:
         if (cursor_pos != 0) {
+          set_displayCursor(-1);
           pfile_info->lfname[cursor_pos] = 0;
+          
           lcd_setCursor(cursor_pos, 1);
           lcd_write(' ');
           cursor_pos--;
           lcd_setCursor(cursor_pos, 1);
+      
           cur_char_pos = 0;
           cur_char = pfile_info->lfname[cursor_pos];
           while (pgm_read_byte(S_FILENAME_CHARS + cur_char_pos) != cur_char) {
             cur_char_pos++;
           }
+          set_displayCursor(cursor_pos);
         }
       break;
       case COMMAND_ABORT_LONG:
+        set_displayCursor(-1);
         lcd_title_P(S_OPERATION_ABORTED);
-        lcd_noCursor();
         lcd_busy_spinner();
-        // exit to previous menu, with cancel
-        return 0;
+        return 0;   // exit to previous menu, with cancel
       break;
       case COMMAND_NEXT:
         cur_char_pos = (cur_char_pos + 1) % max_chars;
         cur_char = pgm_read_byte(S_FILENAME_CHARS + cur_char_pos);
-        lcd_write(cur_char);
-        lcd_setCursor(cursor_pos, 1);
+        set_displayCursor(cursor_pos);  
         pfile_info->lfname[cursor_pos] = cur_char;
       break;
       case COMMAND_PREVIOUS: 
@@ -239,11 +247,13 @@ uint8_t handle_manual_filename(FILINFO* pfile_info) {
         }
         cur_char_pos--;
         cur_char = pgm_read_byte(S_FILENAME_CHARS + cur_char_pos);
-        lcd_write(cur_char);
-        lcd_setCursor(cursor_pos, 1);
+        set_displayCursor(cursor_pos);          
         pfile_info->lfname[cursor_pos] = cur_char;
       break;
-    }    
+    }
+    lcd_setCursor(0, 1);
+    lcd_print(pfile_info->lfname );
+
   }
 }
 
@@ -454,7 +464,9 @@ void main_menu(FILINFO* pfile_info) {
   }
 
   while (1) {
+    
     cur_mode = handle_select_mode(S_SELECT_MODE, ppitems, 3, cur_mode);
+    
     switch (cur_mode) {
       case MODE_PLAY:
         handle_play_mode(pfile_info);

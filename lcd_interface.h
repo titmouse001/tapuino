@@ -12,4 +12,6 @@ void lcd_setCursor(uint8_t col, uint8_t row);
 void lcd_print(char* msg);
 void lcd_write(uint8_t value);
 
+void set_displayCursor(uint8_t col);
+
 #endif

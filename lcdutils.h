@@ -13,6 +13,8 @@ void lcd_title_P(const char* msg);
 void lcd_status(char* msg);
 void lcd_status_P(const char* msg);
 
+void lcd_information_P(const char* msg);
+
 extern char g_char_buffer[];
 
 #endif

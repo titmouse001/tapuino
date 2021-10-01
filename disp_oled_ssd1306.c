@@ -1,3 +1,4 @@
+
 #include "config.h"
 #ifdef LCD_USE_SSD1306_OLED_MODULE
 
@@ -7,16 +8,25 @@
 #include "i2c_master.h"
 #include "font8x8.h"
 
-#define NUM_COLS  16
+
+
+// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
+//#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
+//Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+
+//#define NUM_COLS  16
+//#define NUM_ROWS  2
+#define NUM_COLS  (128/6)   
 #define NUM_ROWS  2
 #define NUM_CHARS NUM_COLS * NUM_ROWS
 
 static uint8_t _addr; // I2C address
 static uint8_t _row, _col;
-static uint8_t _buffer[NUM_CHARS];
+//static uint8_t _buffer[NUM_CHARS];   // REMOVED - NOW OPTIMISED TO SAVE SPACE 
 static uint8_t _displayCursor;
 
-void write_raw(uint8_t value, uint8_t cursor);
+void writechar_raw(uint8_t value, uint8_t cursor);
 void ssd1306_fillscreen(uint8_t fill);
 void ssd1306_send_command_start(void);
 void ssd1306_send_command(uint8_t command);
@@ -87,7 +97,7 @@ void lcd_init(uint8_t lcd_addr)
   _addr = lcd_addr;
   _row = 0;
   _col = 0;
-  _displayCursor = 0;
+  _displayCursor = -1;
   
   i2c_init();
   _delay_ms(100);
@@ -95,20 +105,24 @@ void lcd_init(uint8_t lcd_addr)
   for (i = 0; i < sizeof (ssd1306_init_sequence); i++) {
     ssd1306_send_command(pgm_read_byte(&ssd1306_init_sequence[i]));
   }
+  
   ssd1306_fillscreen(0);
-  memset(_buffer, 32, NUM_CHARS);
+ // memset(_buffer, 32, NUM_CHARS);
+
+
 }
 
 void lcd_cursor() {
-  uint8_t curValue = _buffer[_row * NUM_COLS + _col];
-  _displayCursor = 1;
-  write_raw(curValue, 1);
+ // uint8_t curValue = _buffer[_row * NUM_COLS + _col];
+ // _displayCursor = 1;
+ // write_raw(curValue, 1);
+  
 }
 
 void lcd_noCursor(){
-  uint8_t curValue = _buffer[_row * NUM_COLS + _col];
-  _displayCursor = 0;
-  write_raw(curValue, 0);
+ // uint8_t curValue = _buffer[_row * NUM_COLS + _col];
+ // _displayCursor = 0;
+ // write_raw(curValue, 0);
 }
 
 void lcd_backlight() {
@@ -120,11 +134,13 @@ void lcd_noBacklight() {
 }
 
 
-void write_raw(uint8_t value, uint8_t cursor) {
+void writechar_raw(uint8_t value, uint8_t cursor) {
   uint8_t i, v, col;
-  uint8_t c = value - 32;
+  uint16_t c = (value - 32) * 5;  // smallFont5x7
  
-  col = _col << 3; // convert to pixel: character column * 8
+ // col = _col << 3; // convert to pixel: character column * 8
+  col = _col * 6;  // smallFont5x7 using a 6x8 placement
+  
   ssd1306_send_command_start();
   i2c_write(SSD1306_SETSTARTPAGE + _row);
   i2c_write((col & 0x0f) | SSD1306_LOWCOLUMNADDR);
@@ -132,49 +148,65 @@ void write_raw(uint8_t value, uint8_t cursor) {
     
   ssd1306_send_data_start();
   // write 1 column of the character per iteration
-  for (i = 0; i < 8; i++)
+
+//  for (i = 0; i < 8; i++)
+  for (i = 0; i < 5; i++)    // smallFont5x7 using a 6x8 placement
   {
-    v = pgm_read_byte(&font8x8[c * 8 + i]);
+    v = pgm_read_byte(&smallFont5x7[c + i]);
+    
     // add underline for cursor: last pixel in the column
-    if (cursor) v |= 0x80;
+    if (cursor == _displayCursor) {
+      v |= 0x80;
+    }
     i2c_write(v);
   }
+  
   i2c_stop();
 }
 
 void lcd_setCursor(uint8_t col, uint8_t row)
 {
   if ((row < NUM_ROWS) && (col < NUM_COLS)) {
-    if (_displayCursor) {
-      uint8_t curValue = _buffer[_row * NUM_COLS + _col];
-      write_raw(curValue, 0);
-    }
+ 
+   // if (_displayCursor) {
+   //   uint8_t curValue = _buffer[_row * NUM_COLS + _col];
+   //   write_raw(32, 0);
+  //  }
     
     _col = col;
     _row = row;
-    
-    if (_displayCursor) {
-      uint8_t curValue = _buffer[_row * NUM_COLS + _col];
-      write_raw(curValue, 1);
-    }
+
+   
+    //if (_displayCursor) {
+   //   uint8_t curValue = _buffer[_row * NUM_COLS + _col];
+   //   write_raw(curValue, 1);
+   //   write_raw(32, 1);
+   // }
   } 
+}
+
+void set_displayCursor(uint8_t col){
+
+  _displayCursor = col;
 }
 
 // ----------------------------------------------------------------------------
 
 void lcd_write(uint8_t value) {
-  write_raw(value, 0);
   
-  _buffer[_row * NUM_COLS + _col] = value;
+  writechar_raw(value,_col);
+  
+ // _buffer[_row * NUM_COLS + _col] = value;
   _col++;
   if (_col >= NUM_COLS) {
     _col = 0;
     _row = (_row + 1) % NUM_ROWS;
   }
-  if (_displayCursor) {
-    uint8_t curValue = _buffer[_row * NUM_COLS + _col];
-    write_raw(curValue, 1);
-  }
+//  if (_displayCursor) {
+  //write_raw(value, 1);
+  //  uint8_t curValue = _buffer[_row * NUM_COLS + _col];
+  //  write_raw(curValue, 1);
+ // }
 }
 
 void lcd_print(char *s) {

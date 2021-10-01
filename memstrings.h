@@ -41,6 +41,7 @@ extern const char S_OPEN_FAILED[];
 extern const char S_INVALID_TAP[];
 extern const char S_INVALID_SIZE[];
 extern const char S_LOADING[];
+extern const char S_UNPACKING[];
 extern const char S_OPERATION_COMPLETE[];
 extern const char S_OPERATION_ABORTED[];
 
