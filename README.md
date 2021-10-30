@@ -10,7 +10,7 @@ code: https://github.com/titmouse001/C64TapCompressionTool
 Changes to [Original Tapuino]:
 - Added compression support
   - now loads compressed (packed) tap files
-  - tap files can be compressed with the 'Tap Compression Tool'
+  - tap files can be compressed with the [Tap Compression Tool]
     - compressed files are called .zap files
     - compressed files must keep the .zap filename extension
   - tap files are still supported - you can mix both tap and zap files together
@@ -21,3 +21,4 @@ Changes to [Original Tapuino]:
 - Tweaked display logic
 
 [Original Tapuino]:https://github.com/sweetlilmre/tapuino
+[Tap Compression Tool]:https://github.com/titmouse001/Tapuino-C64TapPackerTool
