@@ -7,7 +7,9 @@ executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1
 code: https://github.com/titmouse001/C64TapCompressionTool  
 
 ----
-Changes to [Original Tapuino]:
+This project is a fork of the [Original Tapuino]
+
+This Tapuino project has the folowing changes:
 - Added compression support
   - now loads compressed (packed) tap files
   - tap files can be compressed with the [Tap Compression Tool]
