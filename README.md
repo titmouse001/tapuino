@@ -1,8 +1,9 @@
 ## Tapuino - tweaked version (added support for compressed file loading)
 
-The C64 tape emulator using an Arduino pro mini (requires ATmega328 2KB hardware).
+The C64 tape emulator uses an Arduino pro mini (requires ATmega328 2KB hardware).
 
-### Compression Tool Can be Found Here:
+### Compression Tool
+A supporting compression tool can be found here:
 executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1.0.0.1  
 code: https://github.com/titmouse001/C64TapCompressionTool  
 
