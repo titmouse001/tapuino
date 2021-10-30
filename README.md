@@ -3,9 +3,9 @@
 The C64 tape emulator uses an Arduino pro mini (requires ATmega328 2KB hardware).
 
 ### Compression Tool
-A supporting compression tool can be found here:
-executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1.0.0.1  
-code: https://github.com/titmouse001/C64TapCompressionTool  
+A supporting compression tool can be found here:  
+executable - https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1.0.0.1  
+code - https://github.com/titmouse001/C64TapCompressionTool  
 
 ----
 This project is a fork of the [Original Tapuino].
@@ -24,6 +24,9 @@ Here's a list of the extra functionality/changes:
 - Tweaked display logic
 
 ## DIY Tapuino
+
+How do I build my own Tapuino?  Full instructions here: http://sweetlilmre.blogspot.com/2015/03/building-tapuino-r2.html
+
 | ![/Images/DIY-Tapuino.png](/Images/DIY-Tapuino.png) | 
 |:--:| 
 | DIY Tapuino |
