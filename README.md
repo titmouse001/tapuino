@@ -1,6 +1,6 @@
 ## Tapuino - tweaked version (added support for compressed file loading)
 
-The C64 Tape Emulator using an Arduino pro mini  (ATmega328 2KB version)
+The C64 tape emulator using an Arduino pro mini (requires ATmega328 2KB hardware).
 
 ### Compression Tool Can be Found Here:
 executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1.0.0.1  
@@ -22,5 +22,14 @@ Here's a list of the extra functionality/changes:
 - Fixed minor scrolling filename bug
 - Tweaked display logic
 
+## DIY Tapuino
+| ![/Images/DIY-Tapuino.png](/Images/DIY-Tapuino.png) | 
+|:--:| 
+| DIY Tapuino |
+
+| ![/Images/DIY-Tapuino.png](/Images/DIY-Tapuino-Running.png) | 
+|:--:| 
+| Running from a C64 |
+ 
 [Original Tapuino]:https://github.com/sweetlilmre/tapuino
 [Tap Compression Tool]:https://github.com/titmouse001/Tapuino-C64TapPackerTool
