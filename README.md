@@ -7,9 +7,9 @@ executable: https://github.com/titmouse001/C64TapCompressionTool/releases/tag/v1
 code: https://github.com/titmouse001/C64TapCompressionTool  
 
 ----
-This project is a fork of the [Original Tapuino]
+This project is a fork of the [Original Tapuino].
 
-This Tapuino project has the folowing changes:
+Here's a list of the extra functionality/changes:
 - Added compression support
   - now loads compressed (packed) tap files
   - tap files can be compressed with the [Tap Compression Tool]
@@ -18,7 +18,7 @@ This Tapuino project has the folowing changes:
   - tap files are still supported - you can mix both tap and zap files together
   - Example savings: Zybex.tap (881KB) -> Zybex.zap (89KB)
 - Replaced 9x9 font with a smaller 5x7
-  - includes a dedicated arrow for indicating off screen text
+  - includes a dedicated arrow for indicating off-screen text
 - Fixed minor scrolling filename bug
 - Tweaked display logic
 
